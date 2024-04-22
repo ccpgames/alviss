@@ -40,8 +40,12 @@ dependencies = [
 
 [project.optional-dependencies]
 fidelius = [
-    "fidelius >=1.0, <1"
+    "fidelius >=1.0, <2"
 ]
+
+[project.scripts]
+alviss-render = "alviss.cli.render.main:main"
+alviss-stubber = "alviss.cli.stubber.main:main"
 
 [project.urls]
 Homepage = "https://github.com/ccpgames/alviss"

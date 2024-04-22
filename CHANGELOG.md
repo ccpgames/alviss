@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.2.0] - 2024-04-19
+## [3.2.0] - 2024-04-22
 
 ### Added
 
@@ -13,8 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   config file and give each value the Python type you expect the config to
   yield in order to generate type-hinting stub-classes that match the structure 
   of your config file(s).
-- CLI commands for running the stub generation: `alviss-mkstubs`
+- CLI commands for running the stub generation: `alviss-stubber`
 - CLI commands for running the config rendering: `alviss-render`
+- A bunch of Alviss specific Error Exceptions that are raised e.g. 
+  when files aren't found or when Fidelius is required but isn't installed
+
+### Changed
+
+- The rendering of static single file configs from Alviss config files and 
+  expressions has now been moved into its own sub-module with a standard API  
 
 
 ## [3.1.0] - 2024-04-12

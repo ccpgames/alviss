@@ -25,7 +25,7 @@ def guess_loader_class(file_name: str) -> Type[IAlvissLoader]:
     ext = os.path.splitext(file_name)[-1]
     loader = _EXTENSION_LOADER_MAP.get(ext, None)
     if not loader:
-        raise NotImplementedError(f'dont know how to autoload file extension {ext}')
+        raise AlvissUnknownFileTypeError(f'Dont know how to autoload file extension {ext}', file_name=file_name)
     return loader
 
 

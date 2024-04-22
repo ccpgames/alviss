@@ -4,6 +4,13 @@ __all__ = [
 from alviss.quickloader import autoload
 from .interface import *
 from ._structs import *
+from alviss.structs.errors import *
+
+import os
+import pathlib
+
+import logging
+log = logging.getLogger(__file__)
 
 
 class SimpleStubMaker(IStubMaker):
@@ -38,3 +45,18 @@ from alviss.structs import BaseConfig
 class AlvissConfigStub(BaseConfig, CfgStub):
     pass"""
 
+    def render_stub_classes_to_file(self, input_file: str, output_file: str, overwrite_existing: bool = False):
+        out = pathlib.Path(output_file).absolute()
+        if out.exists() and not overwrite_existing:
+            raise AlvissFileAlreadyExistsError('Output file already exists', file_name=output_file)
+
+        results = self.render_stub_classes_from_descriptor_file(input_file)
+
+        if not out.parent.exists():
+            log.debug(f'Creating output path: {out.parent}')
+            os.makedirs(out.parent, exist_ok=True)
+
+        with open(output_file, 'w') as fin:
+            fin.write(results)
+
+        return

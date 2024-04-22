@@ -1,5 +1,16 @@
 __all__ = [
     'AlvissError',
+    'AlvissFileNotFoundError',
+    'AlvissFileAlreadyExistsError',
+    'AlvissParsingError',
+
+    'AlvissSyntaxError',
+    'AlvissExpressionResolvingError',
+    'AlvissFideliusError',
+    'AlvissFideliusNotInstalledError',
+    'AlvissFideliusSyntaxError',
+
+    'AlvissUnknownFileTypeError',
     'AlvissStubberError',
     'AlvissStubberSyntaxError',
     'AlvissStubberInvalidTypeName',
@@ -8,6 +19,57 @@ __all__ = [
 
 class AlvissError(Exception):
     pass
+
+
+class AlvissFileNotFoundError(AlvissError, FileNotFoundError):
+    def __init__(self, message: str, file_name: str = '?'):
+        super().__init__(message)
+        self.file_name = file_name
+
+    def __str__(self):
+        return f'{super().__str__()} (file_name="{self.file_name}")'
+
+
+class AlvissFileAlreadyExistsError(AlvissError, FileExistsError):
+    def __init__(self, message: str, file_name: str = '?'):
+        super().__init__(message)
+        self.file_name = file_name
+
+    def __str__(self):
+        return f'{super().__str__()} (file_name="{self.file_name}")'
+
+
+class AlvissParsingError(AlvissError, ValueError):
+    pass
+
+
+class AlvissSyntaxError(AlvissParsingError):
+    pass
+
+
+class AlvissExpressionResolvingError(AlvissParsingError):
+    pass
+
+
+class AlvissFideliusError(AlvissExpressionResolvingError):
+    pass
+
+
+class AlvissFideliusNotInstalledError(AlvissExpressionResolvingError, ImportError):
+    pass
+
+
+class AlvissFideliusSyntaxError(AlvissExpressionResolvingError, AlvissSyntaxError):
+    pass
+
+
+class AlvissUnknownFileTypeError(AlvissParsingError, NotImplementedError):
+    def __init__(self, message: str, file_name: str = '?'):
+        super().__init__(message)
+        self.file_name = file_name
+
+    def __str__(self):
+        return f'{super().__str__()} (file_name="{self.file_name}")'
 
 
 class AlvissStubberError(AlvissError):
