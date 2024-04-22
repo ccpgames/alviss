@@ -1,0 +1,6 @@
+top:  # Required
+  second:  # Required
+    should_be_optional:  # NOT Required
+      bar: str  # NOT Required
+    must_exist:  # Required
+      foo: str*  # Since this is required, all its parents must also be!

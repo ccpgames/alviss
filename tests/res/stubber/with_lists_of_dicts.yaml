@@ -1,0 +1,15 @@
+foo:
+  bar:
+    list_of_people:  # This is all optional
+      - name: str
+        age: int
+        shoe_size: float
+        favorite_foods:
+          - str
+        health:
+          blood_pressure: int
+          weight: float
+          alive: bool
+    list_of_important_people:
+      - name: str*  # This make all of its ancestors Required!
+        title: str

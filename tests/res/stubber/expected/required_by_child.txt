@@ -1,0 +1,38 @@
+__all__ = [
+    'CfgTopSecondShouldBeOptionalStub',
+    'CfgTopSecondMustExistStub',
+    'CfgTopSecondStub',
+    'CfgTopStub',
+    'CfgStub',
+    'AlvissConfigStub',
+]
+
+from typing import *
+from alviss.structs import Empty
+from alviss.structs.cfgstub import _BaseCfgStub
+from alviss.structs import BaseConfig
+
+
+class CfgTopSecondShouldBeOptionalStub(_BaseCfgStub):
+    bar: Union[str, Empty]
+
+
+class CfgTopSecondMustExistStub(_BaseCfgStub):
+    foo: str
+
+
+class CfgTopSecondStub(_BaseCfgStub):
+    should_be_optional: Union[CfgTopSecondShouldBeOptionalStub, Empty]
+    must_exist: CfgTopSecondMustExistStub
+
+
+class CfgTopStub(_BaseCfgStub):
+    second: CfgTopSecondStub
+
+
+class CfgStub(_BaseCfgStub):
+    top: CfgTopStub
+
+
+class AlvissConfigStub(BaseConfig, CfgStub):
+    pass

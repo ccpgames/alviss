@@ -1,0 +1,14 @@
+my_list: list[str]
+myDifferentList:
+  - str
+import_test:
+  generic: Overridden
+  other_list:
+    - str|float
+  required_list:
+    - str*
+  imported_keys: Dict[str, str]
+should_be_seven:
+  list_of_dicts:
+    - Dict[str, str]
+  sub_seven: dict*

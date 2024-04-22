@@ -1,0 +1,77 @@
+__all__ = [
+    'CfgInternalRefDeeperStub',
+    'CfgInternalRefStub',
+    'CfgGroupStub',
+    'CfgCollapsedGroupInOneStub',
+    'CfgCollapsedGroupInStub',
+    'CfgCollapsedGroupStub',
+    'CfgCollapsedStub',
+    'CfgImportTestStub',
+    'CfgShouldBeSevenStub',
+    'CfgStub',
+    'AlvissConfigStub',
+]
+
+from typing import *
+from alviss.structs import Empty
+from alviss.structs.cfgstub import _BaseCfgStub
+from alviss.structs import BaseConfig
+
+
+class CfgInternalRefDeeperStub(_BaseCfgStub):
+    there: Union[str, Empty]
+    everywhere: str
+
+
+class CfgInternalRefStub(_BaseCfgStub):
+    deeper: CfgInternalRefDeeperStub
+
+
+class CfgGroupStub(_BaseCfgStub):
+    alpha: Union[str, int, Empty]
+    beta: Union[float, int, str]
+    gamma_with_var: Union[str, None, Empty]
+    delta: Union[int, None, Empty]
+
+
+class CfgCollapsedGroupInOneStub(_BaseCfgStub):
+    string: Union[int, Empty]
+
+
+class CfgCollapsedGroupInStub(_BaseCfgStub):
+    one: Union[CfgCollapsedGroupInOneStub, Empty]
+
+
+class CfgCollapsedGroupStub(_BaseCfgStub):
+    successful: Union[bool, Empty]
+    in: Union[CfgCollapsedGroupInStub, Empty]
+
+
+class CfgCollapsedStub(_BaseCfgStub):
+    other_group: Union[Dict[str, Any], None, Empty]
+    group: Union[CfgCollapsedGroupStub, Empty]
+
+
+class CfgImportTestStub(_BaseCfgStub):
+    imported_keys: Union[Dict[str, str], Empty]
+
+
+class CfgShouldBeSevenStub(_BaseCfgStub):
+    sub_seven: Dict[str, Any]
+
+
+class CfgStub(_BaseCfgStub):
+    foo: Union[str, Empty]
+    internal_ref: CfgInternalRefStub
+    base_key: Union[int, Empty]
+    foo_inherited: Union[float, Empty]
+    bar: float
+    group: CfgGroupStub
+    collapsed: Union[CfgCollapsedStub, Empty]
+    my_list: Union[List[str], Empty]
+    import_test: Union[CfgImportTestStub, Empty]
+    should_be_seven: CfgShouldBeSevenStub
+
+
+class AlvissConfigStub(BaseConfig, CfgStub):
+    pass

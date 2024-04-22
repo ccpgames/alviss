@@ -1,0 +1,14 @@
+Foo:  # Should be required
+  my_list: list[str]  # Optional
+  my_required_list: List[str]*  # Should be required
+fool: # Optional
+  myDifferentList: # Optional
+    - str
+  myDifferentMultiTypeList: # Optional
+    - str|float
+bar: # Should be required
+  yomama: # Should be required
+    myDifferentRequiredList: # Should be required
+      - str|int*
+    myDifferentRequiredListByKeyName*: # Should be required
+      - any

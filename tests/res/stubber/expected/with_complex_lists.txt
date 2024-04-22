@@ -1,0 +1,42 @@
+__all__ = [
+    'CfgFooStub',
+    'CfgFoolStub',
+    'CfgBarYomamaStub',
+    'CfgBarStub',
+    'CfgStub',
+    'AlvissConfigStub',
+]
+
+from typing import *
+from alviss.structs import Empty
+from alviss.structs.cfgstub import _BaseCfgStub
+from alviss.structs import BaseConfig
+
+
+class CfgFooStub(_BaseCfgStub):
+    my_list: Union[List[str], Empty]
+    my_required_list: List[str]
+
+
+class CfgFoolStub(_BaseCfgStub):
+    myDifferentList: Union[List[str], Empty]
+    myDifferentMultiTypeList: Union[List[Union[str, float]], Empty]
+
+
+class CfgBarYomamaStub(_BaseCfgStub):
+    myDifferentRequiredList: List[Union[str, int]]
+    myDifferentRequiredListByKeyName: List[Any]
+
+
+class CfgBarStub(_BaseCfgStub):
+    yomama: CfgBarYomamaStub
+
+
+class CfgStub(_BaseCfgStub):
+    Foo: CfgFooStub
+    fool: Union[CfgFoolStub, Empty]
+    bar: CfgBarStub
+
+
+class AlvissConfigStub(BaseConfig, CfgStub):
+    pass

@@ -1,0 +1,31 @@
+my_list: list[str]
+my_required_list: list[str]*
+myDifferentList:
+  - str
+myDifferentRequiredList:
+  - str|int*
+myDifferentRequiredListByKeyName*:
+  - any
+import_test:
+  other_list:
+    - str|float
+  required_list:
+    - str*
+  skills:
+    ${str}*:
+      level: int
+      group: str*
+  inventory:
+    ${str}:
+      weight: float
+      quantity: int
+here_be_stuf:
+  people:
+    - name: str*
+      age: int
+      favorite_color: str
+  mandatory_people*:
+    - name: str*
+      age: int
+      level: int*
+  sub_seven: dict*

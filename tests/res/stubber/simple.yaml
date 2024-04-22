@@ -1,0 +1,26 @@
+foo: str
+internal_ref:
+  deeper:
+    there: str
+    everywhere: str*
+base_key: INT
+foo_inherited: float
+bar: float*
+group:
+  alpha: Str | iNt
+  beta: float|int|str*
+  gamma_with_var: str|none
+  delta: int|None
+collapsed:
+  other_group: dict|None
+  group:
+    successful: bool
+    in:
+      one:
+        string: int
+my_list: list[str]
+import_test:
+  imported_keys: Dict[str,str]
+should_be_seven:
+  sub_seven: dict*
+
