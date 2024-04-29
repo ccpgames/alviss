@@ -5,6 +5,7 @@ __all__ = [
 import dataclasses
 from typing import *
 from alviss.structs.errors import *
+from alviss.utils import *
 import re
 
 import logging
@@ -90,6 +91,10 @@ class StubField:
             self.value = self._loop_over_type_words(self.value)
 
     @property
+    def safe_field_name(self) -> str:
+        return escape_keyword(self.name)
+
+    @property
     def is_required(self) -> bool:
         return self.is_self_required or self.has_required_children
 
@@ -102,7 +107,8 @@ class StubField:
     @classmethod
     def from_keyval(cls, key: str, value: Union[str, List, Dict], ancestors: Optional[List[str]],
                     is_map_of_stuff: bool = False,
-                    pre_required: bool = False) -> 'StubField':
+                    pre_required: bool = False,
+                    is_private: bool = True) -> 'StubField':
         required = pre_required
 
         if key.endswith('*'):
@@ -115,10 +121,10 @@ class StubField:
                 if sub_key.endswith('*'):
                     required = True
                 return cls.from_keyval(key=key, value=sub_val, pre_required=required,
-                                       ancestors=ancestors, is_map_of_stuff=True)
+                                       ancestors=ancestors, is_map_of_stuff=True, is_private=is_private)
 
             else:
-                value = StubClass.from_dict(input_dict_or_list=value, field_name=key, ancestors=ancestors)
+                value = StubClass.from_dict(input_dict_or_list=value, field_name=key, ancestors=ancestors, is_private=is_private)
                 return cls(name=key, value=value, is_self_required=required,
                            ancestors=ancestors, is_map_of_stuff=is_map_of_stuff)
 
@@ -128,7 +134,7 @@ class StubField:
                                                field_name='.'.join(ancestors+[key]))
 
             if isinstance(value[0], dict):
-                value = StubClass.from_dict(input_dict_or_list=value[0], field_name=key, ancestors=ancestors)
+                value = StubClass.from_dict(input_dict_or_list=value[0], field_name=key, ancestors=ancestors, is_private=is_private)
                 return cls(name=key, value=value, is_self_required=required, ancestors=ancestors,
                            is_dict_list=True, is_map_of_stuff=is_map_of_stuff)
 
@@ -163,11 +169,11 @@ class StubField:
         if isinstance(self.value, StubClass):
             if self.is_required:
                 if self.is_dict_list:
-                    return f'    {self.name}: List[{self.value.class_name}]'
+                    return f'    {self.safe_field_name}: List[{self.value.class_name}]'
                 elif self.is_map_of_stuff:
-                    return f'    {self.name}: Dict[str, {self.value.class_name}]'
+                    return f'    {self.safe_field_name}: Dict[str, {self.value.class_name}]'
                 else:
-                    return f'    {self.name}: {self.value.class_name}'
+                    return f'    {self.safe_field_name}: {self.value.class_name}'
             else:
                 if self.is_dict_list:
                     type_list = [f'List[{self.value.class_name}]', 'Empty']
@@ -182,11 +188,11 @@ class StubField:
                 type_list.append('Empty')
         else:
             if self.is_required:
-                return f'    {self.name}: {self.value}'
+                return f'    {self.safe_field_name}: {self.value}'
             else:
                 type_list = [self.value, 'Empty']
 
-        return f'    {self.name}: Union[{", ".join(type_list)}]'
+        return f'    {self.safe_field_name}: Union[{", ".join(type_list)}]'
 
 
 @dataclasses.dataclass
@@ -194,6 +200,7 @@ class StubClass:
     name: str
     ancestors: List[str] = dataclasses.field(default_factory=list)
     fields: List[StubField] = dataclasses.field(default_factory=list)
+    is_private: bool = True
 
     @property
     def has_required_fields(self) -> bool:
@@ -206,18 +213,19 @@ class StubClass:
     def from_dict(cls,
                   input_dict_or_list: Union[Dict[str, Any], List[Any]],
                   field_name: str = '',
-                  ancestors: Optional[List[str]] = None) -> 'StubClass':
+                  ancestors: Optional[List[str]] = None,
+                  is_private: bool = True) -> 'StubClass':
         ancestors = ancestors or []
         ancestors.append(field_name)
         if isinstance(input_dict_or_list, dict):
-            fields = [StubField.from_keyval(k, v, ancestors.copy()) for k, v in input_dict_or_list.items()]
+            fields = [StubField.from_keyval(k, v, ancestors.copy(), is_private=is_private) for k, v in input_dict_or_list.items()]
         elif isinstance(input_dict_or_list, list):  # Should you ever get a list...?!?
             log.warning('NOT SURE THIS SHOULD EVER HAPPEN!!!')
-            fields = [StubField.from_keyval('__list__', input_dict_or_list[0], ancestors.copy())]
+            fields = [StubField.from_keyval('__list__', input_dict_or_list[0], ancestors.copy(), is_private=is_private)]
         else:
             raise AlvissStubberSyntaxError(f'Unexpected type fed to StubClass.from_dict: {type(input_dict_or_list)}')
         ancestors.pop()
-        return cls(name=field_name, ancestors=ancestors, fields=fields)
+        return cls(name=field_name, ancestors=ancestors, fields=fields, is_private=is_private)
 
     @staticmethod
     def field_name_to_class_name(field_name: str) -> str:
@@ -239,20 +247,24 @@ class StubClass:
             if not part:
                 continue
             buff.append(part.capitalize())
-        return ''.join(buff)
+        result = ''.join(buff)
+        return escape_keyword(result)  # Just in case!
 
     @property
     def class_name(self) -> str:
+        start = 'Cfg'
+        if self.is_private:
+            start = '_Cfg'
         if not self.name:
-            return 'CfgStub'
+            return f'{start}Stub'
         else:
             if self.ancestors:
-                return f'Cfg{"".join([self.field_name_to_class_name(a) for a in self.ancestors+[self.name]])}Stub'
+                return f'{start}{"".join([self.field_name_to_class_name(a) for a in self.ancestors+[self.name]])}Stub'
             else:
-                return f'Cfg{self.field_name_to_class_name(self.name)}Stub'
+                return f'{start}{self.field_name_to_class_name(self.name)}Stub'
 
     def render_class_str(self) -> str:
-        lines = [f'class {self.class_name}(_BaseCfgStub):']
+        lines = [f'class {self.class_name}(_BaseCfgStub, dict):']
         for field in self.fields:
             lines.append(field.render_field_str())
         return '\n'.join(lines)

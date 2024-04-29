@@ -1,0 +1,23 @@
+logging:
+  version: int
+  disable_existing_loggers: bool
+
+  root:
+    level: str
+    handlers: List[str]
+
+  formatters:
+    base:
+      format: str
+
+  handlers:
+    ${str}:
+      level: str
+      class: str
+      formatter: str
+
+  loggers:
+    ${str}:
+      handlers: List[str]
+      level: str
+      propagate: bool

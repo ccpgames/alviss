@@ -13,24 +13,24 @@ from alviss.structs.cfgstub import _BaseCfgStub
 from alviss.structs import BaseConfig
 
 
-class CfgTopSecondShouldBeOptionalStub(_BaseCfgStub):
+class CfgTopSecondShouldBeOptionalStub(_BaseCfgStub, dict):
     bar: Union[str, Empty]
 
 
-class CfgTopSecondMustExistStub(_BaseCfgStub):
+class CfgTopSecondMustExistStub(_BaseCfgStub, dict):
     foo: str
 
 
-class CfgTopSecondStub(_BaseCfgStub):
+class CfgTopSecondStub(_BaseCfgStub, dict):
     should_be_optional: Union[CfgTopSecondShouldBeOptionalStub, Empty]
     must_exist: CfgTopSecondMustExistStub
 
 
-class CfgTopStub(_BaseCfgStub):
+class CfgTopStub(_BaseCfgStub, dict):
     second: CfgTopSecondStub
 
 
-class CfgStub(_BaseCfgStub):
+class CfgStub(_BaseCfgStub, dict):
     top: CfgTopStub
 
 

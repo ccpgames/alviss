@@ -2,7 +2,7 @@ import os
 import unittest
 
 from alviss.stubber import *
-
+from alviss.quickloader import autoload
 
 import logging
 
@@ -37,22 +37,27 @@ class TestRendering(unittest.TestCase):
 
     def test_simple(self):
         file = os.path.join(_HERE, '../res/stubber/simple.yaml')
-        expected_file = os.path.join(_HERE, '../res/stubber/expected/simple.txt')
-        stubs = SimpleStubMaker().render_stub_classes_from_descriptor_file(file)
+        expected_file = os.path.join(_HERE, '../res/stubber/expected/simple.py')
+        stubs = SimpleStubMaker().render_stub_classes_from_descriptor_file(file, is_private=True)
 
         stub_lines = [line.rstrip() for line in stubs.split('\n')]
         with open(expected_file, 'r') as fin:
-            expected_lines = [line.rstrip() for line in fin.readlines()]
+            expected_lines = [line.rstrip() for line in fin]
 
         self.assertEqual(len(expected_lines), len(stub_lines))
 
         for i in range(len(expected_lines)):
             self.assertEqual(expected_lines[i], stub_lines[i], f'Mismatch in line {i + 1}')
 
+        from tests.res.stubber.expected.simple import AlvissConfigStub
+        cfg: AlvissConfigStub = autoload(os.path.join(_HERE, '../res/stubber/simple_data.yaml'))  # noqa
+        self.assertEqual(42, cfg.collapsed.group.in_.one.string)
+        self.assertEqual(42, cfg.collapsed.group['in']['one']['string'])
+
     def test_required_children(self):
         file = os.path.join(_HERE, '../res/stubber/required_by_child.yaml')
-        expected_file = os.path.join(_HERE, '../res/stubber/expected/required_by_child.txt')
-        stubs = SimpleStubMaker().render_stub_classes_from_descriptor_file(file)
+        expected_file = os.path.join(_HERE, '../res/stubber/expected/required_by_child.py')
+        stubs = SimpleStubMaker().render_stub_classes_from_descriptor_file(file, is_private=False)
 
         stub_lines = [line.rstrip() for line in stubs.split('\n')]
         with open(expected_file, 'r') as fin:
@@ -65,8 +70,8 @@ class TestRendering(unittest.TestCase):
 
     def test_with_complex_lists(self):
         file = os.path.join(_HERE, '../res/stubber/with_complex_lists.yaml')
-        expected_file = os.path.join(_HERE, '../res/stubber/expected/with_complex_lists.txt')
-        stubs = SimpleStubMaker().render_stub_classes_from_descriptor_file(file)
+        expected_file = os.path.join(_HERE, '../res/stubber/expected/with_complex_lists.py')
+        stubs = SimpleStubMaker().render_stub_classes_from_descriptor_file(file, class_name='', is_private=False)
 
         stub_lines = [line.rstrip() for line in stubs.split('\n')]
         with open(expected_file, 'r') as fin:
@@ -83,8 +88,8 @@ class TestRendering(unittest.TestCase):
 
     def test_with_lists_of_dicts(self):
         file = os.path.join(_HERE, '../res/stubber/with_lists_of_dicts.yaml')
-        expected_file = os.path.join(_HERE, '../res/stubber/expected/with_lists_of_dicts.txt')
-        stubs = SimpleStubMaker().render_stub_classes_from_descriptor_file(file)
+        expected_file = os.path.join(_HERE, '../res/stubber/expected/with_lists_of_dicts.py')
+        stubs = SimpleStubMaker().render_stub_classes_from_descriptor_file(file, class_name='', is_private=True)
 
         stub_lines = [line.rstrip() for line in stubs.split('\n')]
         with open(expected_file, 'r') as fin:
@@ -101,8 +106,8 @@ class TestRendering(unittest.TestCase):
 
     def test_with_complex_maps_and_lists(self):
         file = os.path.join(_HERE, '../res/stubber/with_complex_maps_and_lists.yaml')
-        expected_file = os.path.join(_HERE, '../res/stubber/expected/with_complex_maps_and_lists.txt')
-        stubs = SimpleStubMaker().render_stub_classes_from_descriptor_file(file)
+        expected_file = os.path.join(_HERE, '../res/stubber/expected/with_complex_maps_and_lists.py')
+        stubs = SimpleStubMaker().render_stub_classes_from_descriptor_file(file, class_name='ComplexConfig', is_private=False)
 
         stub_lines = [line.rstrip() for line in stubs.split('\n')]
         with open(expected_file, 'r') as fin:

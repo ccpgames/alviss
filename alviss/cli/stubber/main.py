@@ -14,6 +14,11 @@ def main():
     parser.add_argument('-o', '--output', help='File to write the generated stub code to (otherwise its just printed to stdout)',
                         default='', nargs='?')
     parser.add_argument('-f', '--force-overwrite', help='Overwrite existing output file if it exists', action='store_true')
+    parser.add_argument('-n', '--class-name',
+                        help='The name of the resulting "final" stub class generated when outputting to a file (default is "AlvissConfigStub"). Set to "None" to skip generating the "final" class.',
+                        default='AlvissConfigStub')
+    parser.add_argument('-x', '--export-all', help='Make all stub class names public and export via __all__ when outputting to a file.',
+                        action='store_true')
 
     loudness_group = parser.add_mutually_exclusive_group()
     loudness_group.add_argument('-s', '--silent', action='store_true',
@@ -37,12 +42,16 @@ def main():
 
             stubber.SimpleStubMaker().render_stub_classes_to_file(input_file=args.file,
                                                                   output_file=args.output,
-                                                                  overwrite_existing=args.force_overwrite)
+                                                                  overwrite_existing=args.force_overwrite,
+                                                                  is_private=not args.export_all)
         else:
             if not args.silent:
                 print(f'Printing results:')
                 print(f'==================================================')
-            print(stubber.SimpleStubMaker().render_stub_classes_from_descriptor_file(args.file))
+            cls_name = 'AlvissConfigStub' if args.class_name is None else args.class_name
+            if cls_name.lower().strip() == 'none':
+                cls_name = ''
+            print(stubber.SimpleStubMaker().render_stub_classes_from_descriptor_file(args.file, class_name=cls_name, is_private=not args.export_all))
 
             if not args.silent:
                 print(f'==================================================')

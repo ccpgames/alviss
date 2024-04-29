@@ -6,6 +6,36 @@ from ccptools.tpu import iters
 from ccptools.tpu import string
 import json
 import yaml
+import collections
+from alviss.utils import *
+
+
+class _KwSafeEmptyDict(EmptyDict):
+    def __getattribute__(self, name):
+        name = unescape_keyword(name)
+        if hasattr(collections.defaultdict, name):
+            return collections.defaultdict.__getattribute__(self, name)
+        if collections.defaultdict.__contains__(self, name):
+            data = collections.defaultdict.__getitem__(self, name)
+            if isinstance(data, dict):
+                return _KwSafeEmptyDict(**data)
+            elif data is None:
+                return Empty
+            else:
+                return data
+        return Empty
+
+    def __getitem__(self, item):
+        item = unescape_keyword(item)
+        if collections.defaultdict.__contains__(self, item):
+            data = collections.defaultdict.__getitem__(self, item)
+            if isinstance(data, dict):
+                return _KwSafeEmptyDict(**data)
+            elif data is None:
+                return Empty
+            else:
+                return data
+        return Empty
 
 
 class BaseConfig(object):
@@ -41,10 +71,10 @@ class BaseConfig(object):
     _secret_keys = {'pass', 'secret', 'token', 'key'}
 
     def __init__(self, **kwargs):
-        super().__setattr__('_data', EmptyDict(**kwargs))
+        super().__setattr__('_data', _KwSafeEmptyDict(**kwargs))
 
     def __getattr__(self, item):
-        return EmptyDict.__getattribute__(self._data, item)
+        return _KwSafeEmptyDict.__getattribute__(self._data, item)
 
     def __setattr__(self, key, value):
         if key.startswith('_'):
@@ -52,10 +82,10 @@ class BaseConfig(object):
         self.update(**{key: value})
 
     def __str__(self):
-        return EmptyDict.__str__(self._repr_dump(self._data))  # noqa
+        return _KwSafeEmptyDict.__str__(self._repr_dump(self._data))  # noqa
 
     def __repr__(self):
-        return EmptyDict.__repr__(self._repr_dump(self._data))  # noqa
+        return _KwSafeEmptyDict.__repr__(self._repr_dump(self._data))  # noqa
 
     def as_json(self, unmaksed: bool = False) -> str:
         return json.dumps(self.as_dict(unmaksed=unmaksed), indent=4)
@@ -87,8 +117,8 @@ class BaseConfig(object):
         return False
 
     def load(self, **kwargs):
-        super().__setattr__('_data', EmptyDict(**kwargs))
+        super().__setattr__('_data', _KwSafeEmptyDict(**kwargs))
 
     def update(self, **kwargs):
-        iters.nested_dict_update(self._data, EmptyDict(**kwargs))
+        iters.nested_dict_update(self._data, _KwSafeEmptyDict(**kwargs))
 

@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [3.2.1] - 2024-04-29
+
+### Changed
+
+- Stubber now has an option to only "export" the resulting "Final" stub 
+  class and keeping all the other stubs "private" and this option is True by
+  default (they don't really need to be public)
+- You can now give the resulting "Final" config stub a custom name
+- You can also give the "Final" config stub an empty string for a name which 
+  will simply omit generating it (for custom/complex composition of stubs 
+  later on if people want)
+- All stubs now also inherit from `dict` because any attribute in 
+  `BaseConfig` that's a Map (and thus has a stub class) will also behave as 
+  a `dict` (even if `Empty`)
+
+### Fixed
+
+- Stubber now appends an underscore to stubs with Python reserved keywords 
+  like `class` and `def` etc.
+- The `BaseConfig` object now also spots attribute fetching of those 
+  keywords with an appended underscore and fetches the correct attribute 
+  nevertheless.
+
+
 ## [3.2.0] - 2024-04-22
 
 ### Added
