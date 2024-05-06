@@ -15,7 +15,8 @@ class IStubMaker(abc.ABC):
 
     @abc.abstractmethod
     def render_stub_classes_to_file(self, input_file: str, output_file: str,
-                                    overwrite_existing: bool = False, is_private: bool = True):
+                                    overwrite_existing: bool = False, is_private: bool = True,
+                                    class_name: str = 'AlvissConfigStub'):
         """Writer the results of the `render_stub_classes_from_descriptor_file`
         call to the given output file.
         """

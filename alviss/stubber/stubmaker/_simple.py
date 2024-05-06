@@ -56,12 +56,12 @@ from alviss.structs import BaseConfig
 
 {class_str}{root_cls}"""
 
-    def render_stub_classes_to_file(self, input_file: str, output_file: str, overwrite_existing: bool = False, is_private: bool = True):
+    def render_stub_classes_to_file(self, input_file: str, output_file: str, overwrite_existing: bool = False, is_private: bool = True, class_name: str = 'AlvissConfigStub'):
         out = pathlib.Path(output_file).absolute()
         if out.exists() and not overwrite_existing:
             raise AlvissFileAlreadyExistsError('Output file already exists', file_name=output_file)
 
-        results = self.render_stub_classes_from_descriptor_file(input_file, is_private=is_private)
+        results = self.render_stub_classes_from_descriptor_file(input_file, is_private=is_private, class_name=class_name)
 
         if not out.parent.exists():
             log.debug(f'Creating output path: {out.parent}')

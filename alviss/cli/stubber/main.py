@@ -35,6 +35,10 @@ def main():
     if not args.silent:
         print(f'Reading and stubbing file: {args.file}...')
 
+    cls_name = 'AlvissConfigStub' if args.class_name is None else args.class_name
+    if cls_name.lower().strip() == 'none':
+        cls_name = ''
+
     try:
         if args.output:
             if not args.silent:
@@ -43,14 +47,13 @@ def main():
             stubber.SimpleStubMaker().render_stub_classes_to_file(input_file=args.file,
                                                                   output_file=args.output,
                                                                   overwrite_existing=args.force_overwrite,
-                                                                  is_private=not args.export_all)
+                                                                  is_private=not args.export_all,
+                                                                  class_name=cls_name)
         else:
             if not args.silent:
                 print(f'Printing results:')
                 print(f'==================================================')
-            cls_name = 'AlvissConfigStub' if args.class_name is None else args.class_name
-            if cls_name.lower().strip() == 'none':
-                cls_name = ''
+
             print(stubber.SimpleStubMaker().render_stub_classes_from_descriptor_file(args.file, class_name=cls_name, is_private=not args.export_all))
 
             if not args.silent:
