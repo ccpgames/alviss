@@ -44,6 +44,7 @@ class IAlvissLoader(abc.ABC):
                   no_includes: bool = False,
                   no_env_load: bool = False,
                   no_fidelius: bool = False,
+                  no_py_inject: bool = False,
                   encoding: str = 'utf-8'):
         """Loads a config file.
 
@@ -53,6 +54,7 @@ class IAlvissLoader(abc.ABC):
         :param no_includes:
         :param no_env_load:
         :param no_fidelius:
+        :param no_py_inject:
         :param encoding:
         """
         pass
@@ -64,7 +66,7 @@ class IAlvissLoader(abc.ABC):
     @abc.abstractmethod
     def load_raw(self, raw_data: str, no_resolve: bool = False,
                  no_extend: bool = False, no_includes: bool = False, no_env_load: bool = False,
-                 no_fidelius: bool = False):
+                 no_fidelius: bool = False, no_py_inject: bool = False):
         """Loads configuration data directly from a string.
 
         The `load_file` method basically just reads a file and passes its

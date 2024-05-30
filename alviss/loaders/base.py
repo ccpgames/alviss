@@ -5,6 +5,7 @@ __all__ = [
 from alviss.structs import *
 from .interface import *
 from ccptools.tpu import iters
+from ccptools.tpu import strimp
 import os
 import logging
 log = logging.getLogger(__file__)
@@ -38,6 +39,7 @@ class BaseLoader(IAlvissLoader, abc.ABC):
         self._skip_includes: bool = False
         self._skip_extends: bool = False
         self._skip_fidelius: bool = False
+        self._skip_py_inject: bool = False
 
         self._fidelius_keys: Dict[Sequence[str], str] = {}
         self._fidelius_mode: FideliusMode = FideliusMode.ON_DEMAND
@@ -73,12 +75,14 @@ class BaseLoader(IAlvissLoader, abc.ABC):
                   no_includes: bool = False,
                   no_env_load: bool = False,
                   no_fidelius: bool = False,
+                  no_py_inject: bool = False,
                   encoding: str = 'utf-8'):
         self._skip_resolve = no_resolve
         self._skip_env_loading = no_env_load
         self._skip_includes = no_includes
         self._skip_extends = no_extend
         self._skip_fidelius = no_fidelius
+        self._skip_py_inject = no_py_inject
 
         self._file_name = os.path.basename(file_name)
         self._file_path = os.path.dirname(os.path.abspath(file_name))
@@ -353,10 +357,29 @@ class BaseLoader(IAlvissLoader, abc.ABC):
 
             self._fidelius_keys[tuple(path)] = match.group(0)
 
+        if not self._skip_py_inject and key.startswith('__PY__:'):
+            val = self._py_inject(key)
+            if val is not None:
+                if val == '' and key.strip().endswith('!='):
+                    return None  # Still unresolved
+                self._resolve_count += 1
+                return val
+            return match.group(0)
+
         val = self._get_str_key(key)
         if val is not None:
             self._resolve_count += 1
         return val
+
+    def _py_inject(self, key: str) -> Any:
+        default = None
+        if '=' in key:
+            key, default = key.split('=', 2)
+            if isinstance(key, str):
+                if key.endswith('!'):
+                    key = key[0:-1]
+
+        return strimp.get_any(key[7:], default)
 
     def _get_str_key(self, key: str) -> Optional[str]:
         return iters.nested_get(self._data, key.split('.'))

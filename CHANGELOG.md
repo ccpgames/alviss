@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.3.0] - 2024-05-30
+
+## Added
+
+- A new expression for injecting values imported from/via Python like so 
+  `${__PY__:alviss.__version__}`
+  - This uses the `ccptools.tpu.strimp.get_any(...)` to import whatever the 
+    expression key points to and inject into the parsed config
+  - The use case here is mainly to inject dynamic Python values into Alviss 
+    files "on-demand" like when using [ccp-stencil](https://github.com/ccpgames/ccp-stencil) 
+    templates in a CI/CD pipe so you can have the ever-changing version of the 
+    package you're working on injected automatically into the Alviss config file 
+    used as Context for rendering Docker files, Kube manifests and so on 
+    (similar to how it can be done in `pyproject.toml`)
+  - This expression also adheres to the normal format of "defaults" (e.g. 
+    `${__PY__:alviss.__version__=Unknown}`) and "required" (e.g. 
+    `${__PY__:alviss.__version__!=}`)
+
+
 
 ## [3.2.2] - 2024-05-06
 
